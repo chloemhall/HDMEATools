@@ -25,53 +25,77 @@ find_top50_channels <- function(df, age, organoid, condition){
 }
 #' channel_to_index
 #'
-#' Converts a simple integer of channel into more useful index
+#' Converts a simple integer of channel into more useful index, for a list of channels in df1.
 #' ( on 3Brain Accura chips, this is 64 rows x 64 columns. eg. channel 2 is row 1, col 2 ie. 1.2 )
 #'
-#' @param Ch is an integer 1:4096 of the channel / electrode.
-#' @return returns useful index of row.column
+#'@param df1 is the table with the list of integers "Channels" of the electrodes.
+#' @return returns new df with a useful index of rows and columns, listed in separate columns.
 #' @examples
-#' > channel<- channel_to_index(65)
-#' > print(channel)
-#' > 2 1 #ie. row 2. column 1
+#' > new.df<- channel_to_index(test.dataframe)
+#' > print(new.df)
+#' >
 #' @export
-
-channel_to_index <- function(Ch){
-  if (Ch %% 64 == 0){
-    row.idx <- Ch/64
-    col.idx <- 64
-  }else{
-    max.full.rows <- floor(Ch / 64 )
-    row.idx <- (max.full.rows+1)
-    col.idx <- Ch - (max.full.rows*64) }
-
-  Ch.idx <- c(row.idx, col.idx)
-  return(Ch.idx)
+channel_to_index <- function(df1) {
+  list_of_channels <- df1$Channels
+  df.new <- df1
+  for (i in 1:length(list_of_channels)) {
+    Ch <- list_of_channels[i]
+    if (Ch %% 64 == 0) {
+      row.idx <- Ch / 64
+      col.idx <- 64
+    } else {
+      max.full.rows <- floor(Ch / 64 )
+      row.idx <- (max.full.rows + 1)
+      col.idx <- Ch - (max.full.rows * 64)
+    }
+    df.new[i, "row.idx"] <- row.idx
+    df.new[i, "col.idx"] <- col.idx
+  }
+  return(df.new)
 }
-
 #' subtract_frequency
 #'
 #'  take channels from the channelsdf and extract those channels from targetdf
-#' @param channelsdf is a df that has the channels you want / are interested in
-#' @param targetdf is a df with many channels and you want to search it & find the ones you want, which are in channelsdf
-#' @return gives us end_df which is a df where the frequency of x has been subtracted from y.
+#' @param all.data is a df that has all the data in one giant table. You will search and filter it.
+#' @param  age Age of the organoid / experiment you want to select.
+#' @param organoid The repeat number of the organoid / experiment you want to select.
+#' @param condition1 This is the drug condition you want to subtract from ie. baseline.
+#' @param condtion2 This is the drug condition you want to subtract from condition1
+#' @return gives us t3_df which is a df where the frequency of condition2 has been subtracted from condition1.
 #' @export
-subtract_frequency <- function(targetdf, channelsdf){
-  #take channels from the channelsdf and extract those channels from targetdf
-  # ie in this case channelsdf has the channels you want.
-  holding_df <- targetdf %>% filter(Channels %in% c(channelsdf$Channels))
-  h2 <- holding_df %>% filter(Condition == "PTX") %>% arrange(Channels)
 
-  h3 <- holding_df %>%  filter(Condition =="Control")%>% arrange(Channels)
-
-  end_df <- inner_join(h2, h3, by = "Channels") %>%
-    mutate(Frequency_Difference = Frequency.x - Frequency.y) %>%
-    select(Channels, Frequency_Difference)
+  subtract_frequency <- function(all.data, age, organoid, condition1, condition2){
+    #search the giant df. for the right conditions etc.
+    condition1.df <- all.data %>% filter(Condition == condition1, Organoids == organoid, Age == age)
+    condition2.df <- all.data %>% filter(Condition == condition2, Organoids == organoid, Age == age)
+    #now subtract the frequency of condition2.df from condition1.df per channel.
+    t3_df <- inner_join(t1.df, t2.df, by = "Channels") %>%
+      mutate(Frequency_Difference = Frequency.x - Frequency.y) %>%
+      select(Channels, Frequency_Difference)
+    return(t3_df)
+  }
   #  end_df$Ch.Idx <- channels_to_index(ptx_ctrl$Channels)
   #  colnames(end_df)[3] <- "Row.idx"
   #   colnames(end_df)[4] <- "Col.idx"
 
-  return(end_df)
+#' plot_the_difference
+#'
+#' Make a heatmap of the difference in activity between two conditions on the HD-MEA.
+#' @param df.new is the df after subtract_frequency and channel_to_index
+#' @return a matrix representing the difference in activity per electrode
+#' @export
+plot_the_difference <- function(df.new) {
+  # Make an empty (zeroes) 64 x 64 matrix i.e., blank HD-MEA
+  grid_matrix <- matrix(0, nrow = 64, ncol = 64)
+
+  # Loop through each row of the data frame
+  for (i in 1:nrow(df.new)) {
+    row_idx <- df.new$row.idx[i]
+    col_idx <- df.new$col.idx[i]
+    # Set the corresponding cell to the value of freq_difference
+    grid_matrix[row_idx, col_idx] <- df.new$Frequency_Difference[i]
+  }
+  return(grid_matrix)
 }
 
 
