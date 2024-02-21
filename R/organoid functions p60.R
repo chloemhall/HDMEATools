@@ -1,5 +1,15 @@
 # Making functions for the organoid spike counts files.
 library(tidyverse)
+#' read_org_data
+#'
+#' Function to load organoid spikes data, that I have produced using Julia/Jupyter notebook.
+#' See github.com/chloemhall/HD-MEA-Organoids
+#'
+#' @param spikes_file is the .txt file that has the number of spikes measured per channel (row) as a vector.
+#' @param channels_file is the raw file that has the channel numbers used in this analysis. Only relevant when analysis was performed on a subset of channels.
+#' @param condition is the condition of the recording ie. in the organoid experiments, Control, PTX or Propofol.
+#' @return returns useful index of row.column
+#' @export
 
 read_org_data <- function(spikes_file, channels_file, condition) {
   # Load data
@@ -15,7 +25,7 @@ read_org_data <- function(spikes_file, channels_file, condition) {
   org_data$Condition <- condition
 
   # Calculate frequency
-  time = 292.775
+  time = 292.775 #for original 300s at 19,754 Sampling rate
   org_data$Frequency <- org_data$Num.Spikes / time
   return(org_data)
 }
@@ -106,7 +116,13 @@ graph_org_top20 <- function (combined_top20, title) {
 
   return(graph20)
 }
-
+#' make_raster_plot
+#'
+#' Uses the timestamps to make a rasterplot of the spikes.
+#' @param Condition is the condition of recording e.g. Control, PTX, Propofol. This also corresponds to the colours of the plots.
+#' @param title is the title you would like to appear on the plot "Title1"
+#' @param df is of course the df with the timestamps you want to plot. This is returned from the extract_timestamps function.
+#' @export
 make_raster_plot<- function (df, title, Condition) {
 
   conditionColour <- c("Control" = "#333333", "Propofol" = "#9933CC", "PTX" = "#66CC66")
@@ -145,7 +161,13 @@ channel_to_index <- function(Ch){
   Ch.idx <- c(row.idx, col.idx)
   return(Ch.idx)
 }
-
+#' extract_timestamps
+#'
+#' Turns the data points of spikes timed into seconds.
+#' Note that this is for a 19254 effective Sampling Rate, ie. actual recorded SR was 19754 but after timestamp deletion the eff.SR is 19254.
+#' It is important also to check that you have the right number of seconds per chunk, created in Julia, in this case 5 seconds per voltage chunk.
+#' @param dataframe is the previously imported file usually saved as format "Timestamps_of_spikes_60.txt"
+#'@export
 extract_timestamps <- function(dataframe) {
   #trial stack overflow LMc #### THIS WORKS!!!!!!!
   eff.SR <- 19254
@@ -158,6 +180,13 @@ extract_timestamps <- function(dataframe) {
   return(useful_timestamp_data)
 
 }
+#' extract_timestamps
+#'
+#' Turns the data points of spikes timed into seconds.
+#' Note that this is for a 19254 effective Sampling Rate, ie. actual recorded SR was 19754 but after timestamp deletion the eff.SR is 19254.
+#' It is important also to check that you have the right number of seconds per chunk, created in Julia, in this case 3 seconds per voltage chunk.
+#' @param dataframe is the previously imported file usually saved as format "Timestamps_of_spikes_60.txt"
+#'@export
 extract_timestamps_altered <- function(dataframe) {
   #trial stack overflow LMc #### THIS WORKS!!!!!!!
   eff.SR <- 19254
@@ -184,6 +213,12 @@ active_channels_filter <- function(df1, giant_data, organoid, condition) {
   return(filtered_active_df)
 
 }
+#' save_graph
+#'
+#' Saves the graph as a pdf plot 6 inches wide and 4 inches high. Saves in a specified graphs directory, and then returns to the working directory.
+#' @param graph is the variable where the desired graph to save is stored.
+#' @param filename is the name you would like to give the saved graph file e.g. "graph1"
+#' @export
 #input save_graph(graph, "raster_plot_control.pdf")
 save_graph <- function(graph, filename){
   current_directory <- getwd()
@@ -195,4 +230,5 @@ save_graph <- function(graph, filename){
   dev.off()
   setwd(current_directory)
 }
-#test function for burst detection
+#test function for burst detection#
+#to create...
