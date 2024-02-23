@@ -4,7 +4,7 @@
 \alias{channel_to_index}
 \title{channel_to_index}
 \usage{
-channel_to_index(Ch)
+channel_to_index(df1)
 }
 \arguments{
 \item{df1}{is the table with the list of integers "Channels" of the electrodes.}

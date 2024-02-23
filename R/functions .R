@@ -55,7 +55,7 @@ channel_to_index <- function(df1) {
 }
 #' subtract_frequency
 #'
-#'  take channels from the channelsdf and extract those channels from targetdf
+#'  take channels from the giant dataframe and extracts the channels of interest, performing a subtraction calculation of frequency per channel
 #' @param all.data is a df that has all the data in one giant table. You will search and filter it.
 #' @param  age Age of the organoid / experiment you want to select.
 #' @param organoid The repeat number of the organoid / experiment you want to select.
