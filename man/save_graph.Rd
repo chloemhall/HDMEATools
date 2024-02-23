@@ -9,7 +9,7 @@ save_graph(graph, filename)
 \arguments{
 \item{graph}{is the variable where the desired graph to save is stored.}
 
-\item{filename}{is the name you would like to give the graph}
+\item{filename}{is the name you would like to give the saved graph file e.g. "graph1"}
 }
 \description{
 Saves the graph as a pdf plot 6 inches wide and 4 inches high. Saves in a specified graphs directory, and then returns to the working directory.

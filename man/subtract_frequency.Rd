@@ -4,15 +4,21 @@
 \alias{subtract_frequency}
 \title{subtract_frequency}
 \usage{
-subtract_frequency(targetdf, channelsdf)
+subtract_frequency(all.data, age, organoid, condition1, condition2)
 }
 \arguments{
-\item{targetdf}{is a df with many channels and you want to search it & find the ones you want, which are in channelsdf}
+\item{all.data}{is a df that has all the data in one giant table. You will search and filter it.}
 
-\item{channelsdf}{is a df that has the channels you want / are interested in}
+\item{age}{Age of the organoid / experiment you want to select.}
+
+\item{organoid}{The repeat number of the organoid / experiment you want to select.}
+
+\item{condition1}{This is the drug condition you want to subtract from ie. baseline.}
+
+\item{condtion2}{This is the drug condition you want to subtract from condition1}
 }
 \value{
-gives us end_df which is a df where the frequency of x has been subtracted from y.
+gives us t3_df which is a df where the frequency of condition2 has been subtracted from condition1.
 }
 \description{
 take channels from the channelsdf and extract those channels from targetdf

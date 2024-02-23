@@ -7,17 +7,17 @@
 channel_to_index(Ch)
 }
 \arguments{
-\item{Ch}{is an integer 1:4096 of the channel / electrode.}
+\item{df1}{is the table with the list of integers "Channels" of the electrodes.}
 }
 \value{
-returns useful index of row.column
+returns new df with a useful index of rows and columns, listed in separate columns.
 }
 \description{
-Converts a simple integer of channel into more useful index
+Converts a simple integer of channel into more useful index, for a list of channels in df1.
 ( on 3Brain Accura chips, this is 64 rows x 64 columns. eg. channel 2 is row 1, col 2 ie. 1.2 )
 }
 \examples{
-> channel<- channel_to_index(65)
-> print(channel)
-> 2 1 #ie. row 2. column 1
+> new.df<- channel_to_index(test.dataframe)
+> print(new.df)
+>
 }
