@@ -68,7 +68,7 @@ channel_to_index <- function(df1) {
     condition1.df <- all.data %>% filter(Condition == condition1, Organoids == organoid, Age == age)
     condition2.df <- all.data %>% filter(Condition == condition2, Organoids == organoid, Age == age)
     #now subtract the frequency of condition2.df from condition1.df per channel.
-    t3_df <- inner_join(t1.df, t2.df, by = "Channels") %>%
+    t3_df <- inner_join(condition1.df, condition2.df, by = "Channels") %>%
       mutate(Frequency_Difference = Frequency.x - Frequency.y) %>%
       select(Channels, Frequency_Difference)
     return(t3_df)

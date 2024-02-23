@@ -21,5 +21,5 @@ subtract_frequency(all.data, age, organoid, condition1, condition2)
 gives us t3_df which is a df where the frequency of condition2 has been subtracted from condition1.
 }
 \description{
-take channels from the channelsdf and extract those channels from targetdf
+take channels from the giant dataframe and extracts the channels of interest, performing a subtraction calculation of frequency per channel
 }
