@@ -36,23 +36,31 @@ find_top50_channels <- function(df, age, organoid, condition){
 #' >
 #' @export
 channel_to_index <- function(df1) {
-  list_of_channels <- df1$Channels
+  # Make a copy of the dataframe
   df.new <- df1
-  for (i in 1:length(list_of_channels)) {
-    Ch <- list_of_channels[i]
-    if (Ch %% 64 == 0) {
-      row.idx <- Ch / 64
+
+  # Iterate through each row of the dataframe
+  for (i in 1:nrow(df1)) {
+    # Extract the channel number from each row
+    Ch <- df1$Channels[i]
+
+    # Calculate row and column indices
+    row.idx <- ceiling(Ch / 64)  # Calculate the row index
+    col.idx <- Ch %% 64          # Calculate the column index
+
+    # If col.idx is zero, set it to 64
+    if (col.idx == 0) {
       col.idx <- 64
-    } else {
-      max.full.rows <- floor(Ch / 64 )
-      row.idx <- (max.full.rows + 1)
-      col.idx <- Ch - (max.full.rows * 64)
     }
+
+    # Assign row and column indices to the new dataframe
     df.new[i, "row.idx"] <- row.idx
     df.new[i, "col.idx"] <- col.idx
   }
+
   return(df.new)
 }
+
 #' subtract_frequency
 #'
 #'  take channels from the giant dataframe and extracts the channels of interest, performing a subtraction calculation of frequency per channel
