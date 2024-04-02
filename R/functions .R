@@ -279,14 +279,15 @@ find_active_channels <- function(org_data, dodgy_channels) {
 #' extract_timestamps
 #'
 #' Turns the data points of spikes timed into seconds.
-#' Note that this is for a 19254 effective Sampling Rate, ie. actual recorded SR was 19754 but after timestamp deletion the eff.SR is 19254.
+#' Note that this is for an effective Sampling Rate, ie. actual recorded SR was higher, but after timestamp deletion the eff.SR is 19254.
 #' It is important also to check that you have the right number of seconds per chunk, created in Julia, in this case 5 seconds per voltage chunk.
 #' @param dataframe is the previously imported file usually saved as format "Timestamps_of_spikes_60.txt"
+#' @param SR is the effective sampling rate
 #'@export
-extract_timestamps <- function(dataframe) {
+extract_timestamps <- function(dataframe, SR) {
   #trial stack overflow LMc #### THIS WORKS!!!!!!!
-  eff.SR <- 19254
-  eff.SR.per.seg <- eff.SR*5
+  #eff.SR <- 19254
+  eff.SR.per.seg <- SR*5
   useful_timestamp_data<- dataframe|>
     mutate(across(everything(), \(x) imap(str_extract_all(x, "\\d+"), ~ as.numeric(.x) + (.y-1)*eff.SR.per.seg))) |>
     pivot_longer(everything(), cols_vary = "slowest", values_to = "Time", names_to = "Channel") |>
@@ -295,7 +296,7 @@ extract_timestamps <- function(dataframe) {
   return(useful_timestamp_data)
 
 }
-#' extract_timestamps
+#' extract_timestamps_altered
 #'
 #' Turns the data points of spikes timed into seconds.
 #' Note that this is for a 19254 effective Sampling Rate, ie. actual recorded SR was 19754 but after timestamp deletion the eff.SR is 19254.
@@ -334,3 +335,26 @@ save_graph <- function(graph, filename){
 }
 #test function for burst detection#
 #to create...
+
+
+#' find_active_channels_ctx
+#'
+#'sorts the data frame to find all values with a mean Frequency of >0.5Hz, and counts them
+#' @param cortex_data
+#' @param dodgy_channels input any noticeably dodgy channels, e.g. that always seem high in frequency regardless of conditions.
+#' @return returns df of the channels with mean frequency over 0.5Hz.
+#' @export
+find_active_channels_ctx <- function(cortex_data, dodgy_channels) {
+  active_channels <- org_data %>%
+    filter(Frequency > 0.5)
+
+  active_channels_by_condition <- active_channels %>%
+    group_by(Condition, Layer) %>%
+    summarise(Active.Channels = n())
+  # Remove specific dodgy channel
+
+  active_channels_by_condition <- active_channels_by_condition %>%
+    filter(Active.Channels != dodgy_channels) #this channel is always saturated, regardless of organoid & drug.
+  #check that this works now! filter(Active.Channels != '3849') was the original.
+  return(active_channels_by_condition)
+}
