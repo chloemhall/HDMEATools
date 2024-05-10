@@ -120,7 +120,7 @@ loop.length <- length(df.new$Channels) #length of loop
 read_org_data <- function(spikes_file, channels_file, condition) {
   # Load data
   org_data <- read.table(spikes_file, header = FALSE, sep = "\t")
-  organoid_channels <- read.table(channels_file, header = TRUE, sep = "\t")
+  organoid_channels <- read.table(channels_file, header = FALSE, sep = "\t")
 
   # Combine data frames
   org_data <- cbind(org_data, organoid_channels)
@@ -162,8 +162,8 @@ process_organoid_data <- function(spikes_file, channels_file, condition) {
   org_data$Frequency <- org_data$Num.Spikes / time
 
   # Remove specific dodgy channel
-  org_data <- org_data %>%
-    filter(Channels != '3849') #this channel is always saturated, regardless of organoid & drug.
+ # org_data <- org_data %>%
+  #  filter(Channels != '3849') #this channel is always saturated, regardless of organoid & drug.
 
   # Filter for top 50
   top_50 <- head(org_data[order(-org_data$Num.Spikes), ], 50)
