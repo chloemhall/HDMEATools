@@ -3,7 +3,6 @@
 #' find_top50_channels
 #'
 #' Ranks the channels in a df by frequency, and returns the top 50 in a new df.
-#' @param C_temp The temperature in degrees Celsius
 #' @param  df is the dataframe to be filtered. In my case, I have one giant df, so I have other factors to filter by.
 #' @param age is the desired age of the organoid of interested.
 #' @param organoid is the specific organoid I am interested in
@@ -329,6 +328,22 @@ save_graph <- function(graph, filename){
   pdf(file = filename ,
       width = 6, # The width of the plot in inches
       height = 4) # The height of the plot in inches
+  print(graph)
+  dev.off()
+  setwd(current_directory)
+}
+
+#' Saves the graph as a pdf plot w inches wide and h inches high. Saves in a specified graphs directory, and then returns to the working directory.
+#' @param graph is the variable where the desired graph to save is stored.
+#' @param filename is the name you would like to give the saved graph file e.g. "graph1"
+#' @export
+#input save_graph(graph, "raster_plot_control.pdf")
+save_graph_custom <- function(graph, filename, w, h){
+  current_directory <- getwd()
+  setwd("/Users/chloe/Documents/R/Organoids Results/Organoid Results P60/Graphs")
+  pdf(file = filename ,
+      width = w, # The width of the plot in inches
+      height = h) # The height of the plot in inches
   print(graph)
   dev.off()
   setwd(current_directory)
